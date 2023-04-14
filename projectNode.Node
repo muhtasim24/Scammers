@@ -1,0 +1,41 @@
+
+//TCP----------------------------------
+const net = require('net'); // gets the net module
+const client1 = new net.Socket(); //creates the socket to connect to the server
+client1.connect(8080) //conects to port 8080
+
+client1.on('x',function(x){  //function to handle events
+    // future code
+ });
+
+const server = net.createServer(onClientConnection);
+
+server.listen(8080)/// start the server listening 
+
+sock.on('data',function(data){8080})  //  set up a callback when a data is received
+
+sock.on('close',function(){8080})  // close connection
+
+sock.on('error',function(error){8080}) // callback for errors
+// node tcp_server.js
+//TCP-----------------------------------
+//HTTP parese headers-----------------------------------
+//access all the HTTP headers using the Request.headers property
+app.get('/', (req, res) => {
+    console.log(req.headers)
+  })
+app.get('/', (req, res) => {  // Use the Request.header() method to access one individual request header’s value
+    req.header('User-Agent')
+  })
+res.set('Content-Type', 'text/html') //can change any HTTP header value using Response.set()
+res.type('.html')
+// => 'text/html'
+res.type('html')
+// => 'text/html'
+res.type('json')
+// => 'application/json'
+res.type('application/json')
+// => 'application/json'
+res.type('png')
+// => image/png:
+//---------------------------------http
