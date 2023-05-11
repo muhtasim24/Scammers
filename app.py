@@ -1,8 +1,14 @@
 from flask import Flask, request, render_template, redirect, url_for
+from pymongo import MongoClient
+from werkzeug.security import generate_password_hash, check_password_hash
+
 
 app = Flask(__name__, template_folder='templates')
 
-users = {}
+#users = {}
+client = MongoClient('mongodb://mongo:27017')
+db = client['accounts']
+users = db['users']
 
 @app.route('/')
 def index():
@@ -14,10 +20,12 @@ def register():
         username = request.form.get('username')
         password = request.form.get('password')
 
-        if username in users:
+        user = users.find_one({'username': username})
+        if user:
             return "Username already exists! Please try a different one."
         else:
-            users[username] = password
+            hashed_password = generate_password_hash(password)
+            users.insert_one({'username': username, 'password': hashed_password})
             return redirect(url_for('login'))
 
     return render_template('register.html')
@@ -28,12 +36,14 @@ def login():
         username = request.form.get('username')
         password = request.form.get('password')
 
-        if username in users and users[username] == password:
+        user = users.find_one({'username': username})
+        if user and check_password_hash(user['password'], password):
             return redirect(url_for('feed'))
         else:
             return "Invalid username/password. Please try again."
 
     return render_template('login.html')
+
 
 @app.route('/feed')
 def feed():
