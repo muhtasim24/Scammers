@@ -2,9 +2,12 @@ version: '3.3'
 services:
   mongo:
     image: mongo:4.2.5
+
   312assignment1:
     build: .
     environment:
       WAIT_HOSTS: mongo:27017
     ports:
-      - '8080:8000'
+      - "8080:8000"
+    depends_on:
+      - mongo

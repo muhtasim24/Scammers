@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Account</title>
+</head>
+<body>
+    <h1>Welcome, {{ username }}!</h1>
+    <h2>Your Account Details</h2>
+    <p>Username: {{ username }}</p>
+    <p>Total Auctions Won: {{ total_auctions_won }}</p>
+    <h2>Your Current Auctions</h2>
+    <ul>
+        {% for auction in current_auctions %}
+        <li>{{ auction }}</li>
+        {% endfor %}
+    </ul>
+    <a href="{{ url_for('feed') }}"><button>Go to Feed</button></a>
+</body>
+</html>
