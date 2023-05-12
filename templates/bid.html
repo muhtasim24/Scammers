@@ -1,22 +1,16 @@
 <!DOCTYPE html>
 <html>
 <body>
-
-<h2>Place your bid</h2>
-
-<h3>{{ item_name }}</h3>
-<p>{{ item_info.description }}</p>
-<p>Current bid: {{ item_info.current_bid }}</p>
-<p>Highest bidder: {{ item_info.current_bidder }}</p>
-
-<form action="/bid" method="post">
-  Bid amount:<br>
-  <input type="number" name="bid_amount" step="0.01" required><br>
-  <br>
-  <input type="hidden" name="username" value="{{username}}">  <!-- we need a way to get the logged-in user's username -->
-  <input type="hidden" name="item_name" value="{{ item_name }}">
-  <input type="submit" value="Place bid">
-</form>
-
+    <h2>Bid on {{ item_info.item_name }}</h2>
+    <form action="/bid" method="post">
+        Item: {{ item_info.item_name }}<br>
+        Description: {{ item_info.description }}<br>
+        Current Bid: {{ item_info.current_bid }}<br>
+        End Time: {{ item_info.end_time }}<br>
+        <br>
+        Your Bid: <input type="number" name="bid_amount" step="0.01" required><br>
+        <input type="submit" value="Place Bid">
+        <input type="hidden" name="item_name" value="{{ item_name }}">
+    </form>
 </body>
 </html>

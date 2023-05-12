@@ -18,6 +18,7 @@ auction_items = {
 client = MongoClient('mongodb://mongo:27017')
 db = client['accounts']
 users = db['users']
+auction_items=db['auction_items']
 
 @app.route('/')
 def index():
@@ -60,7 +61,7 @@ def echo(sock):
     while True:
         data = sock.receive()
         sock.send(data)
-        
+
 @app.route('/account')
 def account():
     # Get the username of the logged-in user from the session or wherever it is stored
@@ -81,28 +82,36 @@ def account():
 
 @app.route('/feed')
 def feed():
-    return render_template('feed.html', auction_items=auction_items)
+    items = list(auction_items.find())
+    auction_items_dict = {item['item_name']: item for item in items}
+    return render_template('feed.html', auction_items=auction_items_dict)
 
-#@app.route('/bid')
 @app.route('/bid', methods=['GET', 'POST'])
 def bid():
     item_name = request.args.get('item_name') if request.method == 'GET' else request.form.get('item_name')
-    
+    item = auction_items.find_one({'item_name': item_name})
+    print("test state 1")
     if request.method == 'POST':
-        bid_amount = float(request.form.get('bid_amount'))
-        username = request.form.get('username')  # We assume that the username is given in the form
+        print("test state 2")
 
-        if datetime.now() > auction_items[item_name]['end_time']:
+        bid_amount = request.form.get('bid_amount')
+        username = session.get('username')
+
+        if datetime.now() > item['end_time']:
             return "Bidding Period Ended!"
 
-        if item_name in auction_items and bid_amount > auction_items[item_name]['current_bid']:
-            auction_items[item_name]['current_bid'] = bid_amount
-            auction_items[item_name]['current_bidder'] = username
+        print("Bid Amount:", bid_amount)
+        print("Current Bid:", item['current_bid'])
+
+        if bid_amount and float(bid_amount) > item['current_bid']:
+            print("test state 3")
+            auction_items.update_one({'item_name': item_name}, {'$set': {'current_bid': float(bid_amount), 'current_bidder': username}})
             return redirect(url_for('feed'))
         else:
             return "Invalid bid. Please try again."
-    
-    return render_template('bid.html', item_name=item_name, item_info=auction_items[item_name])
+
+    return render_template('bid.html', item_name=item_name, item_info=item)
+
 
 @app.route('/post_item', methods=['GET', 'POST'])
 def post_item():
@@ -112,15 +121,16 @@ def post_item():
         starting_price = float(request.form.get('starting_price'))
         end_time = datetime.now() + timedelta(days=float(request.form.get('days_to_bid')))
 
-        if item_name in auction_items:
+        if auction_items.find_one({'item_name': item_name}):
             return "An item with this name already exists. Please choose a different name."
 
-        auction_items[item_name] = {
-            "description": description, 
-            "current_bid": starting_price, 
+        auction_items.insert_one({
+            "item_name": item_name,
+            "description": description,
+            "current_bid": starting_price,
             "current_bidder": None,
             "end_time": end_time
-        }
+        })
 
         return redirect(url_for('feed'))
 
