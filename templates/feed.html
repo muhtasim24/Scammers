@@ -4,5 +4,20 @@
 
 <h2>Welcome to the feed!</h2>
 
+<a href="/post_item">Post an item to auction!</a>
+
+{% for item_name, item_info in auction_items.items() %}
+<h3>{{ item_name }}</h3>
+<p>{{ item_info.description }}</p>
+<p>Current bid: {{ item_info.current_bid }}</p>
+<p>Highest bidder: {{ item_info.current_bidder }}</p>
+<p>Bidding ends at: {{ item_info.end_time }}</p>
+
+<form action="/bid" method="GET">
+  <input type="hidden" name="item_name" value="{{ item_name }}">
+  <input type="submit" value="Bid on this item">
+</form>
+{% endfor %}
+
 </body>
 </html>

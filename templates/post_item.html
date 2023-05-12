@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>Post a new item for bidding</h2>
+
+<form action="/post_item" method="post">
+  Item name:<br>
+  <input type="text" name="item_name" required><br>
+  Description:<br>
+  <textarea name="description" required></textarea><br>
+  Days to bid:<br>
+  <input type="number" name="days_to_bid" step="1" required><br>
+  Starting price:<br>
+  <input type="number" name="starting_price" step="0.01" required><br>
+  <br>
+  <input type="submit" value="Post item">
+</form>
+
+</body>
+</html>
