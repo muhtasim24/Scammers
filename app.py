@@ -2,9 +2,12 @@ from flask import Flask, request, render_template, redirect, url_for, session
 from datetime import datetime, timedelta
 from pymongo import MongoClient
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_sock import Sock
 
 
 app = Flask(__name__, template_folder='templates')
+sock = Sock(app)
+
 app.secret_key = '354545452'
 
 users = {}
@@ -52,6 +55,12 @@ def login():
 
     return render_template('login.html')
 
+@sock.route('/echo')
+def echo(sock):
+    while True:
+        data = sock.receive()
+        sock.send(data)
+        
 @app.route('/account')
 def account():
     # Get the username of the logged-in user from the session or wherever it is stored
