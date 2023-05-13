@@ -4,6 +4,8 @@ from pymongo import MongoClient
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sock import Sock
 import json
+from datetime import datetime, timedelta
+
 
 app = Flask(__name__, template_folder='templates')
 sock = Sock(app)
@@ -105,7 +107,13 @@ def account():
 def feed():
     items = list(auction_items.find())
     auction_items_dict = {item['item_name']: item for item in items}
+
+    for item_name, item in auction_items_dict.items():
+        remaining_time = item['end_time'] - datetime.now()
+        item['remaining_time'] = max(remaining_time, timedelta(0))
+
     return render_template('feed.html', auction_items=auction_items_dict)
+
 
 @app.route('/bid', methods=['GET', 'POST'])
 def bid():
@@ -140,7 +148,10 @@ def post_item():
         item_name = request.form.get('item_name')
         description = request.form.get('description')
         starting_price = float(request.form.get('starting_price'))
-        end_time = datetime.now() + timedelta(days=float(request.form.get('days_to_bid')))
+        days_to_bid = int(request.form.get('days_to_bid'))
+
+        # Calculate the end time by adding the specified number of days to the current time
+        end_time = datetime.now() + timedelta(days=days_to_bid)
 
         if auction_items.find_one({'item_name': item_name}):
             return "An item with this name already exists. Please choose a different name."
@@ -158,6 +169,7 @@ def post_item():
         return redirect(url_for('feed'))
 
     return render_template('post_item.html')
+
 
 
 

@@ -1,86 +1,66 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Feed</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f2f2f2;
-      margin: 0;
-      padding: 20px;
-    }
-
-    h2 {
-      text-align: center;
-    }
-
-    a.button {
-      display: inline-block;
-      padding: 10px 20px;
-      background-color: #4caf50;
-      color: #ffffff;
-      text-decoration: none;
-      border-radius: 4px;
-      margin-bottom: 10px;
-    }
-
-    h3 {
-      margin-top: 20px;
-    }
-
-    p {
-      margin-bottom: 5px;
-    }
-
-    form {
-      margin-top: 10px;
-    }
-
-    input[type="submit"] {
-      padding: 5px 10px;
-      background-color: #4caf50;
-      color: #ffffff;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-  </style>
-</head>
 <body>
+  <h2>Welcome to the feed!</h2>
+  <a href="{{ url_for('account') }}"><button>Go to your profile page</button></a>
+
+  <a href="/post_item">Post an item to auction!</a>
+
+  {% for item_name, item in auction_items.items() %}
+    <div>
+      <h3>{{ item_name }}</h3>
+      <p>Description: {{ item.description }}</p>
+      <p>Current Bid: {{ item.current_bid }}</p>
+      <p>Remaining Time: {{ item.remaining_time.days }} days, {{ item.remaining_time.seconds // 3600 }} hours</p>
+      <p>Highest bidder: {{ item.current_bidder }}</p>
+
+      <form action="/bid" method="GET">
+        <input type="hidden" name="item_name" value="{{ item_name }}">
+        <input type="submit" value="Bid on this item">
+      </form>
+    </div>
+  {% endfor %}
+
   <script>
     var socket = new WebSocket('ws://localhost:8000/ws');  // Replace with your server URL
-
+  
     socket.onopen = function() {
       console.log('WebSocket connection established.');
     };
-
+  
     socket.onmessage = function(event) {
       var data = JSON.parse(event.data);
       // Handle received data, e.g., update the auction display
+      updateRemainingTime(data);
     };
-
+  
     socket.onclose = function(event) {
       console.log('WebSocket connection closed.');
     };
+  
+    // JavaScript code for updating the countdown
+    function updateRemainingTime(data) {
+      var remainingTimes = document.getElementsByClassName('remaining-time');
+  
+      for (var i = 0; i < remainingTimes.length; i++) {
+        var item_name = remainingTimes[i].getAttribute('data-item-name');
+  
+        if (data.hasOwnProperty(item_name)) {
+          var remainingTime = data[item_name].remaining_time;
+          var days = remainingTime.days;
+          var hours = Math.floor(remainingTime.seconds / 3600);
+  
+          if (days === 0 && hours === 0) {
+            remainingTimes[i].textContent = 'Auction ended';
+          } else {
+            var formattedTime = days + ' days, ' + hours + ' hours';
+            remainingTimes[i].textContent = formattedTime;
+            remainingTimes[i].setAttribute('data-remaining-time', formattedTime);
+          }
+        }
+      }
+    }
   </script>
-
-  <h2>Welcome to the feed!</h2>
-  <a class="button" href="{{ url_for('account') }}">Go to your profile page</a>
-
-  <a class="button" href="/post_item">Post an item to auction!</a>
-
-  {% for item_name, item_info in auction_items.items() %}
-  <h3>{{ item_name }}</h3>
-  <p>{{ item_info.description }}</p>
-  <p>Current bid: {{ item_info.current_bid }}</p>
-  <p>Highest bidder: {{ item_info.current_bidder }}</p>
-  <p>Bidding ends at: {{ item_info.end_time }}</p>
-
-  <form action="/bid" method="GET">
-    <input type="hidden" name="item_name" value="{{ item_name }}">
-    <input type="submit" value="Bid on this item">
-  </form>
-  {% endfor %}
-
+  
 </body>
 </html>
