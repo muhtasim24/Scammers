@@ -3,10 +3,11 @@ from datetime import datetime, timedelta
 from pymongo import MongoClient
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sock import Sock
-
+import json
 
 app = Flask(__name__, template_folder='templates')
 sock = Sock(app)
+connected_clients = set()  # Store connected clients
 
 app.secret_key = '354545452'
 
@@ -39,6 +40,26 @@ def register():
             return redirect(url_for('login'))
 
     return render_template('register.html')
+def broadcast_to_clients(message):
+    for client in connected_clients:
+        client.send(message)
+
+@sock.route('/ws')
+def websocket_connection(sock):
+    connected_clients.add(sock)  # Add the new connected client
+
+ 
+    while not sock.closed:
+        data = sock.receive()
+        # Process received data if needed
+        # Handle individual client messages
+
+        # After processing the data, if you want to broadcast a message to all connected clients, call the `broadcast_to_clients` function
+        message = "Your message to broadcast"
+        broadcast_to_clients(message)
+
+    connected_clients.remove(sock)  # Remove disconnected client
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -131,6 +152,8 @@ def post_item():
             "current_bidder": None,
             "end_time": end_time
         })
+        updated_auction_data = {'item_name': item_name, 'description': description}
+        broadcast_to_clients(json.dumps(updated_auction_data))
 
         return redirect(url_for('feed'))
 

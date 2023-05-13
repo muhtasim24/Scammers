@@ -1,14 +1,65 @@
 <!DOCTYPE html>
 <html>
 <body>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        form {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border: 1px solid #dddddd;
+            border-radius: 4px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #dddddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        input[type="submit"] {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #4caf50;
+            color: #ffffff;
+            text-decoration: none;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+    </style>
+
     <h2>Bid on {{ item_info.item_name }}</h2>
     <form action="/bid" method="post">
-        Item: {{ item_info.item_name }}<br>
-        Description: {{ item_info.description }}<br>
-        Current Bid: {{ item_info.current_bid }}<br>
-        End Time: {{ item_info.end_time }}<br>
+        <label>Item: {{ item_info.item_name }}</label>
+        <label>Description: {{ item_info.description }}</label>
+        <label>Current Bid: {{ item_info.current_bid }}</label>
+        <label>End Time: {{ item_info.end_time }}</label>
         <br>
-        Your Bid: <input type="number" name="bid_amount" step="0.01" required><br>
+        <label>Your Bid: <input type="number" name="bid_amount" step="0.01" required></label>
         <input type="submit" value="Place Bid">
         <input type="hidden" name="item_name" value="{{ item_name }}">
     </form>

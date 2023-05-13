@@ -1,24 +1,86 @@
 <!DOCTYPE html>
 <html>
+<head>
+  <title>Feed</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    a.button {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #4caf50;
+      color: #ffffff;
+      text-decoration: none;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+
+    h3 {
+      margin-top: 20px;
+    }
+
+    p {
+      margin-bottom: 5px;
+    }
+
+    form {
+      margin-top: 10px;
+    }
+
+    input[type="submit"] {
+      padding: 5px 10px;
+      background-color: #4caf50;
+      color: #ffffff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  </style>
+</head>
 <body>
+  <script>
+    var socket = new WebSocket('ws://localhost:8000/ws');  // Replace with your server URL
 
-<h2>Welcome to the feed!</h2>
-<a href="{{ url_for('account') }}"><button>Go to your profile page</button></a>
+    socket.onopen = function() {
+      console.log('WebSocket connection established.');
+    };
 
-<a href="/post_item">Post an item to auction!</a>
+    socket.onmessage = function(event) {
+      var data = JSON.parse(event.data);
+      // Handle received data, e.g., update the auction display
+    };
 
-{% for item_name, item_info in auction_items.items() %}
-<h3>{{ item_name }}</h3>
-<p>{{ item_info.description }}</p>
-<p>Current bid: {{ item_info.current_bid }}</p>
-<p>Highest bidder: {{ item_info.current_bidder }}</p>
-<p>Bidding ends at: {{ item_info.end_time }}</p>
+    socket.onclose = function(event) {
+      console.log('WebSocket connection closed.');
+    };
+  </script>
 
-<form action="/bid" method="GET">
-  <input type="hidden" name="item_name" value="{{ item_name }}">
-  <input type="submit" value="Bid on this item">
-</form>
-{% endfor %}
+  <h2>Welcome to the feed!</h2>
+  <a class="button" href="{{ url_for('account') }}">Go to your profile page</a>
+
+  <a class="button" href="/post_item">Post an item to auction!</a>
+
+  {% for item_name, item_info in auction_items.items() %}
+  <h3>{{ item_name }}</h3>
+  <p>{{ item_info.description }}</p>
+  <p>Current bid: {{ item_info.current_bid }}</p>
+  <p>Highest bidder: {{ item_info.current_bidder }}</p>
+  <p>Bidding ends at: {{ item_info.end_time }}</p>
+
+  <form action="/bid" method="GET">
+    <input type="hidden" name="item_name" value="{{ item_name }}">
+    <input type="submit" value="Bid on this item">
+  </form>
+  {% endfor %}
 
 </body>
 </html>
