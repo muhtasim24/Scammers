@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 
 app = Flask(__name__, template_folder='templates')
 sock = Sock(app)
-connected_clients = set()  # Store connected clients
+connected_clients = set() 
 
 app.secret_key = '354545452'
 
@@ -17,7 +17,6 @@ users = {}
 auction_items = {
 }
 
-#users = {}
 client = MongoClient('mongodb://mongo:27017')
 db = client['accounts']
 users = db['users']
@@ -48,20 +47,16 @@ def broadcast_to_clients(message):
 
 @sock.route('/ws')
 def websocket_connection(sock):
-    connected_clients.add(sock)  # Add the new connected client
+    connected_clients.add(sock)  
 
  
     while not sock.closed:
         data = sock.receive()
-        # Process received data if needed
-        # Handle individual client messages
 
-        # After processing the data, if you want to broadcast a message to all connected clients, call the `broadcast_to_clients` function
         message = "Your message to broadcast"
         broadcast_to_clients(message)
 
-    connected_clients.remove(sock)  # Remove disconnected client
-
+    connected_clients.remove(sock)  
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -72,7 +67,7 @@ def login():
         user = users.find_one({'username': username})
         
         if user and check_password_hash(user['password'], password):
-            session['username'] = username  # Store the username in the session
+            session['username'] = username  
             return redirect(url_for('feed'))
         else:
             return "Invalid credentials, please try again!"
@@ -87,20 +82,17 @@ def echo(sock):
 
 @app.route('/account')
 def account():
-    # Get the username of the logged-in user from the session or wherever it is stored
     username = session.get('username')
     
-    # Fetch the user's account information from the database
     user = users.find_one({'username': username})
     
     if user:
-        # Get the current auctions and total auctions won for the user (example data)
         current_auctions = ['Auction 1', 'Auction 2', 'Auction 3']
         total_auctions_won = 5
     
         return render_template('account.html', username=user['username'], current_auctions=current_auctions, total_auctions_won=total_auctions_won)
     else:
-        return "User not found."  # Or redirect to an error page
+        return "User not found."  
 
 
 @app.route('/feed')
@@ -150,7 +142,6 @@ def post_item():
         starting_price = float(request.form.get('starting_price'))
         days_to_bid = int(request.form.get('days_to_bid'))
 
-        # Calculate the end time by adding the specified number of days to the current time
         end_time = datetime.now() + timedelta(days=days_to_bid)
 
         if auction_items.find_one({'item_name': item_name}):

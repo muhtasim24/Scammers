@@ -1,6 +1,58 @@
 <!DOCTYPE html>
 <html>
 <body>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #620a0a;
+      padding: 20px;
+    }
+
+    h2 {
+      color: #fff;
+      margin-bottom: 20px;
+    }
+
+    a {
+      display: block;
+      margin-bottom: 10px;
+      color: #fff;
+    }
+
+    div {
+      background-color: #fff;
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 20px;
+    }
+
+    h3 {
+      margin: 0;
+      color: #333;
+    }
+
+    p {
+      margin: 10px 0;
+      color: #666;
+    }
+
+    form {
+      margin-top: 10px;
+    }
+
+    input[type="submit"] {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    input[type="submit"]:hover {
+      background-color: #45a049;
+    }
+  </style>
   <h2>Welcome to the feed!</h2>
   <a href="{{ url_for('account') }}"><button>Go to your profile page</button></a>
 
@@ -22,7 +74,7 @@
   {% endfor %}
 
   <script>
-    var socket = new WebSocket('ws://localhost:8000/ws');  // Replace with your server URL
+    var socket = new WebSocket('ws://localhost:8000/ws');  // Replace with server URL
   
     socket.onopen = function() {
       console.log('WebSocket connection established.');
@@ -30,7 +82,6 @@
   
     socket.onmessage = function(event) {
       var data = JSON.parse(event.data);
-      // Handle received data, e.g., update the auction display
       updateRemainingTime(data);
     };
   
@@ -38,7 +89,6 @@
       console.log('WebSocket connection closed.');
     };
   
-    // JavaScript code for updating the countdown
     function updateRemainingTime(data) {
       var remainingTimes = document.getElementsByClassName('remaining-time');
   
