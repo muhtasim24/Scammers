@@ -8,6 +8,15 @@ services:
     environment:
       WAIT_HOSTS: mongo:27017
     ports:
-      - "8080:8000"
+      - "8000:8000"
     depends_on:
       - mongo
+
+  nginx:
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - 312assignment1
