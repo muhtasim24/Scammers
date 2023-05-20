@@ -1,22 +1,15 @@
 version: '3.3'
 services:
+  nginx:
+      build: ./nginx
+      ports: 
+        - '80:80'
+        - '443:443'
   mongo:
     image: mongo:4.2.5
-
-  312assignment1:
+  app:
     build: .
     environment:
       WAIT_HOSTS: mongo:27017
     ports:
-      - "8000:8000"
-    depends_on:
-      - mongo
-
-  nginx:
-    build:
-      context: .
-      dockerfile: Dockerfile.nginx
-    ports:
-      - "80:80"
-    depends_on:
-      - 312assignment1
+      - '8080:8000'
